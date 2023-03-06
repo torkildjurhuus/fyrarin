@@ -6,11 +6,23 @@ function Countdown() {
   useEffect(() => {
     const countdownInterval = setInterval(() => {
       const now = new Date();
-      const targetDate = getNextFirstFriday(now);
-      const diff = targetDate - now;
+      const month = now.getMonth();
+      const year = now.getFullYear();
+      const firstFriday = new Date(year, month, 1);
+      while (firstFriday.getDay() !== 5) {
+        firstFriday.setDate(firstFriday.getDate() + 1);
+      }
+      if (now > firstFriday) {
+        // If first Friday of current month has already passed,
+        // set first Friday to next month
+        firstFriday.setMonth(firstFriday.getMonth() + 1);
+        while (firstFriday.getDay() !== 5) {
+          firstFriday.setDate(firstFriday.getDate() + 1);
+        }
+      }
+      const diff = firstFriday - now;
       setCountdown(diff);
     }, 1000);
-
     return () => clearInterval(countdownInterval);
   }, []);
 
@@ -24,28 +36,10 @@ function Countdown() {
 
   return (
     <div>
-      <h1>Countdown to First Friday of Each Month at 16:00 UTC</h1>
+      <h1>Countdown to First Friday of the Month</h1>
       <p>{formatCountdown(countdown)}</p>
     </div>
   );
-}
-
-function getNextFirstFriday(date) {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth();
-  const firstDayOfMonth = new Date(Date.UTC(year, month, 1));
-  let daysUntilFirstFriday = (5 - firstDayOfMonth.getUTCDay() + 7) % 7;
-
-  // If the first Friday of the month has already passed, we need to get the first Friday of next month
-  if (date.getUTCDate() > daysUntilFirstFriday + 1) {
-    daysUntilFirstFriday += 7;
-  }
-
-  const targetDate = new Date(
-    Date.UTC(year, month, daysUntilFirstFriday + 1, 16, 0, 0)
-  );
-
-  return targetDate;
 }
 
 export default Countdown;
