@@ -24,7 +24,7 @@ function Countdown() {
 
   return (
     <div>
-      <h1>Niðurteljing til næsta fýrara</h1>
+      <h1>Countdown to First Friday of Each Month at 16:00 UTC</h1>
       <p>{formatCountdown(countdown)}</p>
     </div>
   );
@@ -34,18 +34,16 @@ function getNextFirstFriday(date) {
   const year = date.getUTCFullYear();
   const month = date.getUTCMonth();
   const firstDayOfMonth = new Date(Date.UTC(year, month, 1));
-  const daysUntilFirstFriday = (5 - firstDayOfMonth.getUTCDay() + 7) % 7;
-  const targetDate = new Date(
-    Date.UTC(year, month, 1 + daysUntilFirstFriday, 16, 0, 0)
-  );
+  let daysUntilFirstFriday = (5 - firstDayOfMonth.getUTCDay() + 7) % 7;
 
-  if (targetDate < date) {
-    // The first Friday of this month has already passed, so we need to get the first Friday of next month
-    targetDate.setUTCMonth(month + 1);
-    targetDate.setUTCDate(1);
-    const daysUntilNextFirstFriday = (5 - targetDate.getUTCDay() + 7) % 7;
-    targetDate.setUTCDate(1 + daysUntilNextFirstFriday);
+  // If the first Friday of the month has already passed, we need to get the first Friday of next month
+  if (date.getUTCDate() > daysUntilFirstFriday + 1) {
+    daysUntilFirstFriday += 7;
   }
+
+  const targetDate = new Date(
+    Date.UTC(year, month, daysUntilFirstFriday + 1, 16, 0, 0)
+  );
 
   return targetDate;
 }
